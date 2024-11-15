@@ -1,6 +1,8 @@
 Barrier
 =======
 
+.. autoclass:: ipctk.Barrier
+.. autoclass:: ipctk.ClampedLogBarrier
 .. autofunction:: ipctk.barrier
 .. autofunction:: ipctk.barrier_first_derivative
 .. autofunction:: ipctk.barrier_second_derivative

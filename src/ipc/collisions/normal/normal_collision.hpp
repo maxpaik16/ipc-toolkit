@@ -92,6 +92,10 @@ public:
     /// @brief The term's weight (e.g., collision area)
     double weight = 1;
 
+    double beta = 1;
+    bool use_beta = false;
+    mutable double last_energy;
+
     /// @brief The gradient of the term's weight wrt the rest positions.
     Eigen::SparseVector<double> weight_gradient;
 };

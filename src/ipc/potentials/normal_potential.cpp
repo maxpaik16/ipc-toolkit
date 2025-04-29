@@ -55,8 +55,10 @@ double NormalPotential::operator()(
     // w * m(x) * f(d(x))
     // NOTE: can save a multiplication by checking if !collision.is_mollified()
     const double d = collision.compute_distance(positions);
-    return collision.weight * collision.mollifier(positions)
+    double energy =  collision.weight * collision.beta * collision.mollifier(positions)
         * (*this)(d, collision.dmin);
+    collision.last_energy = energy;
+    return energy;
 }
 
 VectorMax12d NormalPotential::gradient(
@@ -74,7 +76,7 @@ VectorMax12d NormalPotential::gradient(
 
     if (!collision.is_mollified()) {
         // ∇[f(d(x))] = f'(d(x)) * ∇d(x)
-        return (collision.weight * grad_f) * grad_d;
+        return (collision.weight * collision.beta * grad_f) * grad_d;
     }
 
     const double m = collision.mollifier(positions); // m(x)
@@ -82,8 +84,8 @@ VectorMax12d NormalPotential::gradient(
         collision.mollifier_gradient(positions); // ∇m(x)
 
     // ∇[m(x) * f(d(x))] = f(d(x)) * ∇m(x) + m(x) * ∇ f(d(x))
-    return (collision.weight * f) * grad_m
-        + (collision.weight * m * grad_f) * grad_d;
+    return (collision.weight * collision.beta * f) * grad_m
+        + (collision.weight * collision.beta * m * grad_f) * grad_d;
 }
 
 MatrixMax12d NormalPotential::hessian(
@@ -107,8 +109,8 @@ MatrixMax12d NormalPotential::hessian(
     if (!collision.is_mollified()) {
         // ∇²[f(d(x))] = ∇(f'(d(x)) * ∇d(x))
         //             = f"(d(x)) * ∇d(x) * ∇d(x)ᵀ + f'(d(x)) * ∇²d(x)
-        hess = (collision.weight * hess_f) * grad_d * grad_d.transpose()
-            + (collision.weight * grad_f) * hess_d;
+        hess = (collision.weight * collision.beta * hess_f) * grad_d * grad_d.transpose()
+            + (collision.weight * collision.beta * grad_f) * hess_d;
     } else {
         const double f = (*this)(d, collision.dmin); // f(d(x))
 
@@ -119,16 +121,16 @@ MatrixMax12d NormalPotential::hessian(
         // ∇² m(x)
         const MatrixMax12d hess_m = collision.mollifier_hessian(positions);
 
-        const double weighted_m = collision.weight * m;
+        const double weighted_m = collision.weight * collision.beta * m;
 
         // ∇f(d(x)) * ∇m(x)ᵀ
         const MatrixMax12d grad_f_grad_m =
-            (collision.weight * grad_f) * grad_d * grad_m.transpose();
+            (collision.weight * collision.beta * grad_f) * grad_d * grad_m.transpose();
 
         // ∇²[m(x) * f(d(x))] = ∇[∇m(x) * f(d(x)) + m(x) * ∇f(d(x))]
         //                    = ∇²m(x) * f(d(x)) + ∇f(d(x)) * ∇m(x)ᵀ
         //                      + ∇m(x) * ∇f(d(x))ᵀ + m(x) * ∇²f(d(x))
-        hess = (collision.weight * f) * hess_m + grad_f_grad_m
+        hess = (collision.weight * collision.beta * f) * hess_m + grad_f_grad_m
             + grad_f_grad_m.transpose()
             + (weighted_m * hess_f) * grad_d * grad_d.transpose()
             + (weighted_m * grad_f) * hess_d;

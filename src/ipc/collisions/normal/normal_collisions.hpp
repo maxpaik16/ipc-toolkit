@@ -154,6 +154,19 @@ public:
     /// @brief Plane-vertex normal collisions.
     std::vector<PlaneVertexNormalCollision> pv_collisions;
 
+    /// @brief Vertex-vertex normal collisions.
+    std::vector<VertexVertexNormalCollision> prev_vv_collisions;
+    /// @brief Edge-vertex normal collisions.
+    std::vector<EdgeVertexNormalCollision> prev_ev_collisions;
+    /// @brief Edge-edge normal collisions.
+    std::vector<EdgeEdgeNormalCollision> prev_ee_collisions;
+    /// @brief Face-vertex normal collisions.
+    std::vector<FaceVertexNormalCollision> prev_fv_collisions;
+    /// @brief Plane-vertex normal collisions.
+    std::vector<PlaneVertexNormalCollision> prev_pv_collisions;
+
+    double step_size; 
+
 protected:
     bool m_use_area_weighting = false;
     bool m_use_improved_max_approximator = false;

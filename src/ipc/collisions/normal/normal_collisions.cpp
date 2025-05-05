@@ -343,8 +343,10 @@ void NormalCollisions::build(
             PlaneVertexNormalCollision& prev_pv_collision = prev_pv_collisions[pvj];
             if (pv_collision.use_beta && !prev_pv_collision.first_call && pv_collision == prev_pv_collision)
             {
+                std::cout << "old beta: " << pv_collision.beta << std::endl;
                 pv_collision.beta += h * (W - prev_pv_collision.last_energy);
                 pv_collision.beta = std::min(1.0, std::max(0.0, pv_collision.beta));
+                std::cout << "new beta: " << pv_collision.beta << std::endl;
             }
         }        
     }

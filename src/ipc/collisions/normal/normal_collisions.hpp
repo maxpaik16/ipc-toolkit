@@ -169,6 +169,7 @@ public:
 
     double h = 0.01; // step size
     double W = 1; // max energy
+    bool use_beta = false;
 
 protected:
     bool m_use_area_weighting = false;

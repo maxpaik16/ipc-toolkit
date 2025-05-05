@@ -276,6 +276,7 @@ void NormalCollisions::build(
     for (size_t ci = 0; ci < size(); ci++) {
         NormalCollision& collision = (*this)[ci];
         collision.dmin = dmin;
+        collision.use_beta = use_beta;
     }
 
     for (size_t vvi = 0; vvi < vv_collisions.size(); ++vvi)

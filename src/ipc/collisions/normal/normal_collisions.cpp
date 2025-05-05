@@ -14,6 +14,8 @@
 #include <tbb/parallel_reduce.h>
 #include <tbb/parallel_sort.h>
 
+#include <iostream>
+
 #include <stdexcept> // std::out_of_range
 
 namespace ipc {
@@ -286,10 +288,16 @@ void NormalCollisions::build(
         for (size_t vvj = 0; vvj < prev_vv_collisions.size(); ++vvj)
         {
             VertexVertexNormalCollision& prev_vv_collision = prev_vv_collisions[vvj];
-            if (vv_collision.use_beta && !prev_vv_collision.first_call && vv_collision == prev_vv_collision)
+            if (!prev_vv_collision.first_call && vv_collision == prev_vv_collision)
             {
+                if (vv_collision.use_beta)
+                {
                 vv_collision.beta = prev_vv_collision.beta + h * (W * prev_vv_collision.weight - prev_vv_collision.last_energy);
                 vv_collision.beta = std::min(1.0, std::max(0.0, vv_collision.beta));
+                } else
+                {
+                    vv_collision.beta = prev_vv_collision.beta;
+                }
             }
         }
     }
@@ -300,10 +308,16 @@ void NormalCollisions::build(
         for (size_t evj = 0; evj < prev_ev_collisions.size(); ++evj)
         {
             EdgeVertexNormalCollision& prev_ev_collision = prev_ev_collisions[evj];
-            if (ev_collision.use_beta && !prev_ev_collision.first_call && ev_collision == prev_ev_collision)
+            if (!prev_ev_collision.first_call && ev_collision == prev_ev_collision)
             {
-                ev_collision.beta = prev_ev_collision.beta + h * (W * prev_ev_collision.weight - prev_ev_collision.last_energy);
-                ev_collision.beta = std::min(1.0, std::max(0.0, ev_collision.beta));
+                if (ev_collision.use_beta)
+                {
+                    ev_collision.beta = prev_ev_collision.beta + h * (W * prev_ev_collision.weight - prev_ev_collision.last_energy);
+                    ev_collision.beta = std::min(1.0, std::max(0.0, ev_collision.beta));
+                } else
+                {
+                    ev_collision.beta = prev_ev_collision.beta;
+                }
             }
         }        
     }
@@ -314,10 +328,19 @@ void NormalCollisions::build(
         for (size_t eej = 0; eej < prev_ee_collisions.size(); ++eej)
         {
             EdgeEdgeNormalCollision& prev_ee_collision = prev_ee_collisions[eej];
-            if (ee_collision.use_beta && !prev_ee_collision.first_call && ee_collision == prev_ee_collision)
+            if (!prev_ee_collision.first_call && ee_collision == prev_ee_collision)
             {
-                ee_collision.beta = prev_ee_collision.beta + h * (W * prev_ee_collision.weight - prev_ee_collision.last_energy);
-                ee_collision.beta = std::min(1.0, std::max(0.0, ee_collision.beta));
+                if (ee_collision.use_beta)
+                {
+                    //std::cout << "previous beta: " << prev_ee_collision.beta << std::endl;
+                    ee_collision.beta = prev_ee_collision.beta + h * (W * prev_ee_collision.weight - prev_ee_collision.last_energy);
+                    ee_collision.beta = std::min(1.0, std::max(0.0, ee_collision.beta));
+                    //std::cout << "new beta: " << ee_collision.beta << std::endl;
+                } else
+                {
+                    ee_collision.beta = prev_ee_collision.beta;
+                    //std::cout << "same beta: " << ee_collision.beta << std::endl;
+                }
             }
         }        
     }
@@ -328,10 +351,16 @@ void NormalCollisions::build(
         for (size_t fvj = 0; fvj < prev_fv_collisions.size(); ++fvj)
         {
             FaceVertexNormalCollision& prev_fv_collision = prev_fv_collisions[fvj];
-            if (fv_collision.use_beta && !prev_fv_collision.first_call && fv_collision == prev_fv_collision)
+            if (!prev_fv_collision.first_call && fv_collision == prev_fv_collision)
             {
-                fv_collision.beta = prev_fv_collision.beta + h * (W * prev_fv_collision.weight - prev_fv_collision.last_energy);
-                fv_collision.beta = std::min(1.0, std::max(0.0, fv_collision.beta));
+                if (fv_collision.use_beta)
+                {
+                    fv_collision.beta = prev_fv_collision.beta + h * (W * prev_fv_collision.weight - prev_fv_collision.last_energy);
+                    fv_collision.beta = std::min(1.0, std::max(0.0, fv_collision.beta));
+                } else 
+                {
+                    fv_collision.beta = prev_fv_collision.beta;
+                }
             }
         }        
     }
@@ -342,10 +371,16 @@ void NormalCollisions::build(
         for (size_t pvj = 0; pvj < prev_pv_collisions.size(); ++pvj)
         {
             PlaneVertexNormalCollision& prev_pv_collision = prev_pv_collisions[pvj];
-            if (pv_collision.use_beta && !prev_pv_collision.first_call && pv_collision == prev_pv_collision)
+            if (!prev_pv_collision.first_call && pv_collision == prev_pv_collision)
             {
-                pv_collision.beta = prev_pv_collision.beta + h * (W * prev_pv_collision.weight - prev_pv_collision.last_energy);
-                pv_collision.beta = std::min(1.0, std::max(0.0, pv_collision.beta));
+                if (pv_collision.use_beta)
+                {
+                    pv_collision.beta = prev_pv_collision.beta + h * (W * prev_pv_collision.weight - prev_pv_collision.last_energy);
+                    pv_collision.beta = std::min(1.0, std::max(0.0, pv_collision.beta));
+                } else
+                {
+                    pv_collision.beta = prev_pv_collision.beta;
+                }
             }
         }        
     }

@@ -46,6 +46,11 @@ public:
 
     /// @brief The vertex's id.
     long vertex_id;
+
+    bool operator==(const PlaneVertexNormalCollision& other) const
+    {
+        return (this->vertex_id == other.vertex_id) && ((this->plane_origin - other.plane_origin).norm() < 1e-7) && ((this->plane_normal - other.plane_normal).norm() < 1e-7);
+    }
 };
 
 } // namespace ipc

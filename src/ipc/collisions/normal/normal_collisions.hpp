@@ -80,6 +80,8 @@ public:
     /// @return A const reference to the collision.
     const NormalCollision& operator[](size_t i) const;
 
+    bool get_prev_collision(size_t i, NormalCollision& collision) const;
+
     /// @brief Get if the collision at i is a vertex-vertex collision.
     /// @param i The index of the collision.
     /// @return If the collision at i is a vertex-vertex collision.
@@ -165,7 +167,8 @@ public:
     /// @brief Plane-vertex normal collisions.
     std::vector<PlaneVertexNormalCollision> prev_pv_collisions;
 
-    double step_size; 
+    double h = 0.01; // step size
+    double W = 1; // max energy
 
 protected:
     bool m_use_area_weighting = false;

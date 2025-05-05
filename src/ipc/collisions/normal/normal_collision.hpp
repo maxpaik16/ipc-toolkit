@@ -94,6 +94,7 @@ public:
 
     double beta = 1;
     bool use_beta = false;
+    mutable bool first_call = true;
     mutable double last_energy;
 
     /// @brief The gradient of the term's weight wrt the rest positions.

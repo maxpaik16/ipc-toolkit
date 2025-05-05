@@ -277,6 +277,76 @@ void NormalCollisions::build(
         NormalCollision& collision = (*this)[ci];
         collision.dmin = dmin;
     }
+
+    for (size_t vvi = 0; vvi < vv_collisions.size(); ++vvi)
+    {
+        VertexVertexNormalCollision& vv_collision = vv_collisions[vvi];
+        for (size_t vvj = 0; vvj < prev_vv_collisions.size(); ++vvj)
+        {
+            VertexVertexNormalCollision& prev_vv_collision = prev_vv_collisions[vvj];
+            if (vv_collision.use_beta && !prev_vv_collision.first_call && vv_collision == prev_vv_collision)
+            {
+                vv_collision.beta += h * (W - prev_vv_collision.last_energy);
+                vv_collision.beta = std::min(1.0, std::max(0.0, vv_collision.beta));
+            }
+        }
+    }
+
+    for (size_t evi = 0; evi < ev_collisions.size(); ++evi)
+    {
+        EdgeVertexNormalCollision& ev_collision = ev_collisions[evi];
+        for (size_t evj = 0; evj < prev_ev_collisions.size(); ++evj)
+        {
+            EdgeVertexNormalCollision& prev_ev_collision = prev_ev_collisions[evj];
+            if (ev_collision.use_beta && !prev_ev_collision.first_call && ev_collision == prev_ev_collision)
+            {
+                ev_collision.beta += h * (W - prev_ev_collision.last_energy);
+                ev_collision.beta = std::min(1.0, std::max(0.0, ev_collision.beta));
+            }
+        }        
+    }
+
+    for (size_t eei = 0; eei < ee_collisions.size(); ++eei)
+    {
+        EdgeEdgeNormalCollision& ee_collision = ee_collisions[eei];
+        for (size_t eej = 0; eej < prev_ee_collisions.size(); ++eej)
+        {
+            EdgeEdgeNormalCollision& prev_ee_collision = prev_ee_collisions[eej];
+            if (ee_collision.use_beta && !prev_ee_collision.first_call && ee_collision == prev_ee_collision)
+            {
+                ee_collision.beta += h * (W - prev_ee_collision.last_energy);
+                ee_collision.beta = std::min(1.0, std::max(0.0, ee_collision.beta));
+            }
+        }        
+    }
+
+    for (size_t fvi = 0; fvi < fv_collisions.size(); ++fvi)
+    {
+        FaceVertexNormalCollision& fv_collision = fv_collisions[fvi];
+        for (size_t fvj = 0; fvj < prev_fv_collisions.size(); ++fvj)
+        {
+            FaceVertexNormalCollision& prev_fv_collision = prev_fv_collisions[fvj];
+            if (fv_collision.use_beta && !prev_fv_collision.first_call && fv_collision == prev_fv_collision)
+            {
+                fv_collision.beta += h * (W - prev_fv_collision.last_energy);
+                fv_collision.beta = std::min(1.0, std::max(0.0, fv_collision.beta));
+            }
+        }        
+    }
+
+    for (size_t pvi = 0; pvi < pv_collisions.size(); ++pvi)
+    {
+        PlaneVertexNormalCollision& pv_collision = pv_collisions[pvi];
+        for (size_t pvj = 0; pvj < prev_pv_collisions.size(); ++pvj)
+        {
+            PlaneVertexNormalCollision& prev_pv_collision = prev_pv_collisions[pvj];
+            if (pv_collision.use_beta && !prev_pv_collision.first_call && pv_collision == prev_pv_collision)
+            {
+                pv_collision.beta += h * (W - prev_pv_collision.last_energy);
+                pv_collision.beta = std::min(1.0, std::max(0.0, pv_collision.beta));
+            }
+        }        
+    }
 }
 
 void NormalCollisions::set_use_area_weighting(const bool use_area_weighting)
@@ -373,6 +443,12 @@ bool NormalCollisions::empty() const
 
 void NormalCollisions::clear()
 {
+    prev_vv_collisions = std::move(vv_collisions);
+    prev_ev_collisions = std::move(ev_collisions);
+    prev_ee_collisions = std::move(ee_collisions);
+    prev_fv_collisions = std::move(fv_collisions);
+    prev_pv_collisions = std::move(pv_collisions);
+    
     vv_collisions.clear();
     ev_collisions.clear();
     ee_collisions.clear();
@@ -402,6 +478,35 @@ NormalCollision& NormalCollisions::operator[](size_t i)
         return pv_collisions[i];
     }
     throw std::out_of_range("Collision index is out of range!");
+}
+
+bool NormalCollisions::get_prev_collision(size_t i, NormalCollision& collision) const
+{
+    if (i < prev_vv_collisions.size()) {
+        collision = prev_vv_collisions[i];
+        return true;
+    }
+    i -= prev_vv_collisions.size();
+    if (i < prev_ev_collisions.size()) {
+        collision = prev_ev_collisions[i];
+        return true;
+    }
+    i -= prev_ev_collisions.size();
+    if (i < prev_ee_collisions.size()) {
+        collision = prev_ee_collisions[i];
+        return true;
+    }
+    i -= prev_ee_collisions.size();
+    if (i < prev_fv_collisions.size()) {
+        collision = prev_fv_collisions[i];
+        return true;
+    }
+    i -= prev_fv_collisions.size();
+    if (i < prev_pv_collisions.size()) {
+        collision = prev_pv_collisions[i];
+        return true;
+    }
+    return false;
 }
 
 const NormalCollision& NormalCollisions::operator[](size_t i) const

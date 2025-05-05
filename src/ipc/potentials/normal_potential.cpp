@@ -58,6 +58,7 @@ double NormalPotential::operator()(
     double energy =  collision.weight * collision.beta * collision.mollifier(positions)
         * (*this)(d, collision.dmin);
     collision.last_energy = energy;
+    collision.first_call = false;
     return energy;
 }
 

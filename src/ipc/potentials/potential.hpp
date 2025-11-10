@@ -3,6 +3,8 @@
 #include <ipc/collision_mesh.hpp>
 #include <ipc/utils/eigen_ext.hpp>
 
+#include <set>
+
 namespace ipc {
 
 /// @brief Base class for potentials.
@@ -80,6 +82,8 @@ public:
         Eigen::ConstRef<VectorMaxNd> x,
         const PSDProjectionMethod project_hessian_to_psd =
             PSDProjectionMethod::NONE) const = 0;
+
+    mutable std::set<int> dofs_to_project;
 };
 
 } // namespace ipc

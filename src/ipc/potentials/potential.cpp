@@ -123,9 +123,35 @@ Eigen::SparseMatrix<double> Potential<TCollisions>::hessian(
             for (size_t i = start; i < end; i++) {
                 const TCollision& collision = collisions[i];
 
-                const MatrixMaxNd local_hess = this->hessian(
-                    collisions[i], collisions[i].dof(X, edges, faces),
-                    project_hessian_to_psd);
+                MatrixMaxNd local_hess;
+                
+                if (dofs_to_project.size() > 0)
+                {
+                    PSDProjectionMethod projection_method = PSDProjectionMethod::NONE;
+                    const int n_v = collision.num_vertices();
+                    const std::array<index_t, 4> vis = collision.vertex_ids(edges, faces);
+                    for (int j = 0; j < n_v; j++)
+                    {
+                        for (int d = 0; d < dim; ++d)
+                        {
+                            int global_dof = dim * mesh.to_full_vertex_id(vis[j]) + d;
+                            if (dofs_to_project.count(global_dof) != 0)
+                            {
+                                projection_method = PSDProjectionMethod::CLAMP;
+                            }
+                        }	
+                    }
+
+                    local_hess = this->hessian(
+                        collisions[i], collisions[i].dof(X, edges, faces),
+                        projection_method);
+                }
+                else 
+                {
+                    local_hess = this->hessian(
+                        collisions[i], collisions[i].dof(X, edges, faces),
+                        project_hessian_to_psd);
+                }
 
                 const std::array<index_t, TCollision::STENCIL_SIZE> vids =
                     collision.vertex_ids(edges, faces);

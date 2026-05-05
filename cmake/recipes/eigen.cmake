@@ -30,6 +30,8 @@ set_target_properties(Eigen3_Eigen PROPERTIES
   INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "${eigen_SOURCE_DIR}"
 )
 
+target_compile_definitions(Eigen3_Eigen INTERFACE EIGEN_STACK_ALLOCATION_LIMIT=262144)
+
 if(EIGEN_DONT_VECTORIZE)
     target_compile_definitions(Eigen3_Eigen INTERFACE EIGEN_DONT_VECTORIZE=1)
 endif()
